@@ -277,11 +277,8 @@ void eloop(int (*idle)(),
     if (nfds == 0) {
       eprintf("idle\n");
 
-      if (0 && handlein(parsemsg) == -1) {
-        eprintf("handlein\n");
-      }
       if (idle() == -1) {
-        eprintf("handleidle");
+        eprintf("handleidle\n");
       }
     }
 
