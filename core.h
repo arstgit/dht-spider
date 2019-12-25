@@ -16,6 +16,7 @@
 #include <string.h>
 #include <sys/epoll.h>
 #include <sys/socket.h>
+#include <sys/timerfd.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -23,6 +24,7 @@
 
 #define MAX_EVENTS 10
 #define EPOLL_TIMEOUT 2 * 1000
+#define FINDNODE_INTERVAL 20
 #define BUF_SIZE 102400
 #define NODE_SIZE 4096
 #define MAGNET_PREFIX "magnet:?xt=urn:btih:"

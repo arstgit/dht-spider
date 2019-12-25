@@ -15,10 +15,5 @@ dhtspider.
 
 run:
 ```
-  $ dhtspider
-```
-
-## Test
-```
-  $ make clean && make test
+  $ dhtspider > [magnetfile]
 ```

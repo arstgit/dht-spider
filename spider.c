@@ -24,7 +24,6 @@ char hash[20];
 char tid[2];
 char token[8];
 int nodesfullflag = 0;
-unsigned long cnt = 0;
 
 char *neighbor(char *id) {
   memcpy(neighborid, id, 6);
@@ -210,7 +209,7 @@ int respondping(char *buf, int numRead, struct sockaddr *addr,
   int len;
 
   s = decodedict(buf, numRead, "t", &val, &vallen);
-  fflush(stdout);
+  fflush(stderr);
   if (s == -1 || val == NULL) {
     eprintf("decodedict: respondping, t\n");
     return -1;
@@ -219,7 +218,7 @@ int respondping(char *buf, int numRead, struct sockaddr *addr,
   tidlen = vallen;
 
   s = decodedict(buf, numRead, "id", &val, &vallen);
-  fflush(stdout);
+  fflush(stderr);
   if (s == -1 || val == NULL) {
     eprintf("decodedict: respondping, id\n");
     return -1;
@@ -261,7 +260,7 @@ int respondannouncepeer(char *buf, int numRead, struct sockaddr *addr,
   int len;
 
   s = decodedict(buf, numRead, "info_hash", &val, &vallen);
-  fflush(stdout);
+  fflush(stderr);
   if (s == -1 || val == NULL) {
     eprintf("decodedict: respondannouncepeer, info_hash\n");
     return -1;
@@ -271,15 +270,14 @@ int respondannouncepeer(char *buf, int numRead, struct sockaddr *addr,
     return -1;
   }
   memcpy(hash, val, 20);
-  fprintf(stderr, "%s", MAGNET_PREFIX);
+  fprintf(stdout, "%s", MAGNET_PREFIX);
   for (int i = 0; i < 20; i++) {
-    fprintf(stderr, "%02hhx", 0xff & hash[i]);
+    fprintf(stdout, "%02hhx", 0xff & hash[i]);
   }
-  fprintf(stderr, "  cnt: %lu\n", cnt++);
-  fflush(stderr);
+  fflush(stdout);
 
   s = decodedict(buf, numRead, "t", &val, &vallen);
-  fflush(stdout);
+  fflush(stderr);
   if (s == -1 || val == NULL) {
     eprintf("decodedict: respondgetpeers, t\n");
     return -1;
@@ -288,7 +286,7 @@ int respondannouncepeer(char *buf, int numRead, struct sockaddr *addr,
   tidlen = vallen;
 
   s = decodedict(buf, numRead, "id", &val, &vallen);
-  fflush(stdout);
+  fflush(stderr);
   if (s == -1 || val == NULL) {
     eprintf("decodedict: respondannouncepeer, id\n");
     return -1;
@@ -353,7 +351,7 @@ int respondgetpeers(char *buf, int numRead, struct sockaddr *addr,
   }
 
   s = decodedict(buf, numRead, "t", &val, &vallen);
-  fflush(stdout);
+  fflush(stderr);
   if (s == -1 || val == NULL) {
     eprintf("decodedict: respondgetpeers, t\n");
     return -1;
@@ -362,7 +360,7 @@ int respondgetpeers(char *buf, int numRead, struct sockaddr *addr,
   tidlen = vallen;
 
   s = decodedict(buf, numRead, "id", &val, &vallen);
-  fflush(stdout);
+  fflush(stderr);
   if (s == -1 || val == NULL) {
     eprintf("decodedict: respondgetpeers, id\n");
     return -1;
@@ -429,7 +427,7 @@ int respondfindnode(char *buf, int numRead, struct sockaddr *addr,
   }
 
   s = decodedict(buf, numRead, "t", &val, &vallen);
-  fflush(stdout);
+  fflush(stderr);
   if (s == -1 || val == NULL) {
     eprintf("decodedict: respondfindnode, t\n");
     return -1;
@@ -438,7 +436,7 @@ int respondfindnode(char *buf, int numRead, struct sockaddr *addr,
   tidlen = vallen;
 
   s = decodedict(buf, numRead, "id", &val, &vallen);
-  fflush(stdout);
+  fflush(stderr);
   if (s == -1 || val == NULL) {
     eprintf("decodedict: respondfindnode, id\n");
     return -1;
@@ -557,7 +555,7 @@ int parsemsg(char *buf, int numRead, struct sockaddr *addr, socklen_t addrlen) {
   int vallen;
 
   res = decodedict(buf, numRead, "y", &val, &vallen);
-  fflush(stdout);
+  fflush(stderr);
   if (res == -1 || val == NULL) {
     // printf("\n");
     // for (int i = 0; i < numRead; i++)
@@ -573,7 +571,7 @@ int parsemsg(char *buf, int numRead, struct sockaddr *addr, socklen_t addrlen) {
   cmp = memcmp(val, "r", 1);
   if (cmp == 0) {
     res = decodedict(buf, numRead, "nodes", &val, &vallen);
-    fflush(stdout);
+    fflush(stderr);
     if (res == -1 || val == NULL) {
       eprintf("decodedict: nodes\n");
       return -1;
@@ -588,7 +586,7 @@ int parsemsg(char *buf, int numRead, struct sockaddr *addr, socklen_t addrlen) {
   cmp = memcmp(val, "q", 1);
   if (cmp == 0) {
     res = decodedict(buf, numRead, "q", &val, &vallen);
-    fflush(stdout);
+    fflush(stderr);
     if (res == -1 || val == NULL) {
       eprintf("decodedict: q\n");
       return -1;

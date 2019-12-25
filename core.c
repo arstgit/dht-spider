@@ -99,7 +99,7 @@ void eprintf(const char *fmt, ...) {
     return;
   }
 
-  eprint(p, 0);
+  eprint(p, 1, STDERR_FILENO);
 
   free(p);
   return;
@@ -227,7 +227,13 @@ void eloop(int (*idle)(),
            int (*parsemsg)(char *, int, struct sockaddr *, socklen_t)) {
   struct epoll_event ev, evlist[MAX_EVENTS];
   struct sigaction sa;
-  int efd, nfds;
+  int efd, nfds, tfd;
+  struct timespec start_time = {.tv_sec = 0, .tv_nsec = 1},
+                  interval_time = {.tv_sec = FINDNODE_INTERVAL, .tv_nsec = 0};
+  struct itimerspec new_time = {.it_value = start_time,
+                                .it_interval = interval_time};
+  uint64_t time_data;
+  int numRead;
 
   memset(&sa, 0, sizeof(sa));
   sa.sa_flags = 0;
@@ -239,6 +245,17 @@ void eloop(int (*idle)(),
   sa.sa_handler = onexit;
   if (0 && sigaction(SIGINT, &sa, NULL) == -1) {
     perror("failed to ignore SIGINT; sigaction");
+    exit(EXIT_FAILURE);
+  }
+
+  tfd = timerfd_create(CLOCK_REALTIME, TFD_NONBLOCK);
+  if (tfd == -1) {
+    perror("timerfd_create");
+    exit(EXIT_FAILURE);
+  }
+
+  if (timerfd_settime(tfd, 0, &new_time, NULL) == -1) {
+    perror("timerfd_settime");
     exit(EXIT_FAILURE);
   }
 
@@ -255,10 +272,16 @@ void eloop(int (*idle)(),
   }
 
   ev.data.fd = listenfd;
-  //ev.events = EPOLLIN;
   ev.events = EPOLLIN | EPOLLET;
   if (epoll_ctl(efd, EPOLL_CTL_ADD, listenfd, &ev) == -1) {
-    perror("epoll_ctl, EPOLL_CTL_ADD");
+    perror("epoll_ctl, EPOLL_CTL_ADD 1");
+    exit(EXIT_FAILURE);
+  }
+
+  ev.data.fd = tfd;
+  ev.events = EPOLLIN | EPOLLET;
+  if (epoll_ctl(efd, EPOLL_CTL_ADD, tfd, &ev) == -1) {
+    perror("epoll_ctl, EPOLL_CTL_ADD 2");
     exit(EXIT_FAILURE);
   }
 
@@ -283,8 +306,37 @@ void eloop(int (*idle)(),
     }
 
     for (int n = 0; n < nfds; n++) {
-      if (handlein(parsemsg) == -1) {
-        eprintf("handlein\n");
+      if (evlist[n].data.fd == listenfd) {
+        if (handlein(parsemsg) == -1) {
+          eprintf("handlein\n");
+        }
+      }
+
+      if (evlist[n].data.fd == tfd) {
+        eprintf("timerfd timeout\n");
+
+        for (;;) {
+          numRead = read(tfd, &time_data, sizeof(uint64_t));
+          if (numRead == -1) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+              break;
+            } else {
+              perror("read, timerfd");
+              exit(EXIT_FAILURE);
+            }
+          }
+          if (numRead == 0) {
+            eprintf("read, numRead: 0, timerfd\n");
+            break;
+          }
+          if (numRead > 0) {
+            continue;
+          }
+
+          if (idle() == -1) {
+            eprintf("handleidle\n");
+          }
+        }
       }
     }
   }

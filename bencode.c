@@ -71,12 +71,12 @@ int decodedict(char *buf, int len, char *key, char **pval, int *vallen) {
           continue;
         }
       } else {
-        printf("decodedict, not numflag\n");
+        fprintf(stderr, "decodedict, not numflag\n");
         return -1;
       }
     }
 
-    printf("*p not expected, c: %c, pos: %ld\n", *p, p - buf);
+    fprintf(stderr, "*p not expected, c: %c, pos: %ld\n", *p, p - buf);
     return -1;
   }
 
@@ -85,7 +85,7 @@ int decodedict(char *buf, int len, char *key, char **pval, int *vallen) {
     *vallen = 0;
     return 0;
   } else {
-    printf("decodedict, level not 0\n");
+    fprintf(stderr, "decodedict, level not 0\n");
     return -1;
   }
 }
@@ -123,7 +123,7 @@ char *encodestring(char *res, int *preslen, char *str, int len) {
 
   numstr = inttostring(&len);
   if (numstr == NULL) {
-    printf("inttostring, encodestring\n");
+    fprintf(stderr, "inttostring, encodestring\n");
     fflush(stdout);
     exit(EXIT_FAILURE);
   }
