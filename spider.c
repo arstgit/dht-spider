@@ -26,8 +26,8 @@ char token[8];
 int nodesfullflag = 0;
 
 char *neighbor(char *id) {
-  memcpy(neighborid, id, 6);
-  memcpy(neighborid + 6, hostnodeid, 14);
+  memcpy(neighborid, id, NEIGHBOR_OFFSET);
+  memcpy(neighborid + NEIGHBOR_OFFSET, hostnodeid, 14);
   return neighborid;
 }
 
@@ -274,6 +274,7 @@ int respondannouncepeer(char *buf, int numRead, struct sockaddr *addr,
   for (int i = 0; i < 20; i++) {
     fprintf(stdout, "%02hhx", 0xff & hash[i]);
   }
+  fprintf(stdout, "\n");
   fflush(stdout);
 
   s = decodedict(buf, numRead, "t", &val, &vallen);

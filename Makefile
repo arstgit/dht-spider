@@ -17,8 +17,7 @@ all: spider
 spider: bencode.o core.o spider.o
 	$(CC) -o $@ $^
 
-test: spider
-	./spider
+test: all
 
 pretty:
 	clang-format -i *.c *.h
