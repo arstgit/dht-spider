@@ -6,6 +6,8 @@ CFLAGS_release =
 CFLAGS_debug = -g -O0
 CFLAGS = ${CFLAGS_${BUILD}}
 
+LIBS=
+
 # EXAMPLE: 
 #   $ make clean && make BUILD=debug
 
@@ -15,12 +17,12 @@ all: spider
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 spider: bencode.o core.o spider.o
-	$(CC) -o $@ $^
+	$(CC) -o $@ $^ $(LIBS)
 
 test: all
 
 up:
-	docker-compose up --build
+	mkdir data && docker-compose up --build
 
 pretty:
 	clang-format -i *.c *.h

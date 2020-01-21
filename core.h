@@ -23,8 +23,8 @@
 #include "bencode.h"
 
 #define MAX_EVENTS 10
-#define EPOLL_TIMEOUT 5 * 1000
-#define FINDNODE_INTERVAL 1
+#define EPOLL_TIMEOUT 10 * 1000
+#define FINDNODE_INTERVAL 5
 #define BUF_SIZE 102400
 #define NODE_SIZE 1024
 #define MAGNET_PREFIX "magnet:?xt=urn:btih:"

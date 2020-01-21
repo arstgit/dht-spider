@@ -3,6 +3,6 @@ services:
   app:
     build: .
     ports:
-      - "6339:6339"
+      - "6339:6339/udp"
     cap_add:
       - NET_ADMIN
