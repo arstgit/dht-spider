@@ -19,6 +19,9 @@ spider: bencode.o core.o spider.o
 
 test: all
 
+up:
+	docker-compose up --build
+
 pretty:
 	clang-format -i *.c *.h
 
@@ -29,4 +32,3 @@ clean:
 	rm -f *.o spider
 
 .PHONY: clean pretty install
-

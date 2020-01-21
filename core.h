@@ -28,7 +28,7 @@
 #define BUF_SIZE 102400
 #define NODE_SIZE 1024
 #define MAGNET_PREFIX "magnet:?xt=urn:btih:"
-#define NEIGHBOR_OFFSET 5
+#define NEIGHBOR_OFFSET 6
 
 enum elevel { INFO_LEVEL, ERR_LEVEL };
 
