@@ -330,11 +330,10 @@ void eloop(int (*idle)(),
             break;
           }
           if (numRead > 0) {
+            if (idle() == -1) {
+              eprintf("handleidle\n");
+            }
             continue;
-          }
-
-          if (idle() == -1) {
-            eprintf("handleidle\n");
           }
         }
       }
