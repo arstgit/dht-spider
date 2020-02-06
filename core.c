@@ -313,8 +313,6 @@ void eloop(int (*idle)(),
       }
 
       if (evlist[n].data.fd == tfd) {
-        eprintf("timerfd timeout\n");
-
         for (;;) {
           numRead = read(tfd, &time_data, sizeof(uint64_t));
           if (numRead == -1) {

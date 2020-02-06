@@ -13,7 +13,17 @@ dhtspider.
 
 ## Usage
 
-run:
+In order to read result from stdout, simply run:
 ```
-  $ dhtspider > [magnetfile]
+  $ dhtspider
 ```
+
+Or, make result piped to a `fifo` file:
+```
+  $ dhtspider fifo
+```
+The fifo file is located in /var/dhtspider/, named `fifo`.
+
+## Traffic control
+
+`tc` is used with docker to control the out traffic, you can modify `Dockerfile` and `docker-compose.yml` for more sophisticated control.

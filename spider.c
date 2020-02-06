@@ -190,6 +190,11 @@ int sendbencode(char *res, int len, struct sockaddr *addr, socklen_t addrlen) {
   numsend = sendto(listenfd, res, len, 0, addr, addrlen);
   if (numsend != len) {
     eprintf("sendto, sendbencode\n");
+
+    if(numsend == -1) {
+      perror("sendto, sendbencode");
+    }
+
     return -1;
   }
 
@@ -258,6 +263,7 @@ int respondannouncepeer(char *buf, int numRead, struct sockaddr *addr,
   int s;
   char *res;
   int len;
+  int dbWr;
 
   s = decodedict(buf, numRead, "info_hash", &val, &vallen);
   fflush(stderr);
@@ -270,12 +276,18 @@ int respondannouncepeer(char *buf, int numRead, struct sockaddr *addr,
     return -1;
   }
   memcpy(hash, val, 20);
-  fprintf(stdout, "%s", MAGNET_PREFIX);
   for (int i = 0; i < 20; i++) {
-    fprintf(stdout, "%02hhx", 0xff & hash[i]);
+    dbWr = dprintf(dbfd, "%02hhx", 0xff & hash[i]);
+    if(dbWr < 0) {
+      perror("dprintf 1");
+      eprintf("dprintf 1 wrong\n");
+    }
   }
-  fprintf(stdout, "\n");
-  fflush(stdout);
+  dbWr = dprintf(dbfd, "\n");
+  if(dbWr < 0) {
+    perror("dprintf 2");
+    eprintf("dprintf 2 wrong\n");
+  }
 
   s = decodedict(buf, numRead, "t", &val, &vallen);
   fflush(stderr);
@@ -681,6 +693,29 @@ int idle() {
 }
 
 int main(int argc, char **argv) {
+  int check;
+  dbfd = 1;
+  if (argc == 2 && strcmp(argv[1], "fifo") == 0) {
+    // create fifo file
+    check = mkdir("/var/dhtspider", 0666);
+    if (check == -1 && errno != EEXIST) {
+      perror("mkdir, main");
+      exit(EXIT_FAILURE);
+    }
+
+    check = mkfifo("/var/dhtspider/fifo", 0666);
+    if (check == -1 && errno != EEXIST) {
+      perror("mkfifo, main");
+      exit(EXIT_FAILURE);
+    }
+
+    dbfd = open("/var/dhtspider/fifo", O_WRONLY);
+    if (dbfd == -1) {
+      perror("open, main");
+      exit(EXIT_FAILURE);
+    }
+  }
+
   getrandomid(hostnodeid);
 
   eloop(idle, parsemsg);
